@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gedge TLNS Serial Console</title>
+<style>
+  body { font-family: ui-monospace, "DejaVu Sans Mono", monospace;
+         max-width: 760px; margin: 2em auto; padding: 0 1em; color: #222; }
+  h1 { font-size: 1.3em; margin-bottom: 0.2em; }
+  .hint { color: #666; font-size: 0.9em; line-height: 1.4; }
+  .row { margin: 0.7em 0; }
+  label { display: block; margin-bottom: 0.25em; }
+  button, input, pre { font: inherit; }
+  button { padding: 0.45em 0.9em; cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: 0.5; }
+  input[type=text] { width: 100%; box-sizing: border-box; padding: 0.5em;
+                     font-size: 1.05em; letter-spacing: 0.04em; }
+  #log { background: #111; color: #0f0; padding: 0.7em; height: 14em;
+         overflow-y: auto; white-space: pre-wrap; margin: 0.3em 0; }
+  .ok  { color: #6f6; }
+  .err { color: #f88; }
+  code { background: #eee; padding: 0.05em 0.3em; border-radius: 3px; }
+  #status { margin-left: 0.5em; }
+</style>
+</head>
+<body>
+
+<h1>Gedge TLNS Serial Console</h1>
+<p class="hint">
+Web Serial API proof-of-concept. Chromium / Chrome / Edge only — not Firefox.
+Must be served from <code>https://</code> or <code>http://localhost</code>
+(open via <code>file://</code> won't work).
+For a quick local test: run <code>python3 -m http.server 8000</code> in this
+folder, then open <code>http://localhost:8000/gedge_serial.html</code>.
+</p>
+
+<div class="row">
+  <button id="connect">Connect…</button>
+  <button id="disconnect" disabled>Disconnect</button>
+  <span id="status">Not connected.</span>
+</div>
+
+<div class="row">
+  <label for="cmd">Command (sent verbatim, no terminator appended):</label>
+  <input id="cmd" type="text" value="F00100I15D000500" autocomplete="off" spellcheck="false">
+</div>
+
+<div class="row">
+  <button id="send" disabled>Send</button>
+  <span class="hint">
+    Press <kbd>Enter</kbd> in the box to send. Format
+    <code>F#####I##D######</code>: F=Hz (00000–99999),
+    I=intensity (00–20), D=duration ms (000000–999999).
+  </span>
+</div>
+
+<div class="row">
+  <label>Log:</label>
+  <pre id="log"></pre>
+  <button id="clear">Clear log</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let port = null, writer = null, reader = null;
+
+function log(msg, cls) {
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = msg + '\n';
+  $('log').appendChild(span);
+  $('log').scrollTop = $('log').scrollHeight;
+}
+
+if (!('serial' in navigator)) {
+  $('status').textContent = 'Web Serial API not supported in this browser.';
+  $('status').className = 'err';
+  $('connect').disabled = true;
+}
+
+async function connect() {
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 115200 });
+    writer = port.writable.getWriter();
+    const info = port.getInfo();
+    const v = info.usbVendorId,  p = info.usbProductId;
+    const vh = v != null ? v.toString(16).padStart(4, '0') : '?';
+    const ph = p != null ? p.toString(16).padStart(4, '0') : '?';
+    $('status').textContent = `Open @ 115200 baud (USB ${vh}:${ph})`;
+    log('Connected at 115200 baud.', 'ok');
+    $('connect').disabled = true;
+    $('disconnect').disabled = false;
+    $('send').disabled = false;
+    readLoop();
+  } catch (e) {
+    log('Connect failed: ' + e.message, 'err');
+  }
+}
+
+async function disconnect() {
+  try {
+    if (reader) { await reader.cancel(); reader = null; }
+    if (writer) { writer.releaseLock();  writer = null; }
+    if (port)   { await port.close();    port   = null; }
+    $('status').textContent = 'Closed.';
+    log('Disconnected.', 'ok');
+    $('connect').disabled = false;
+    $('disconnect').disabled = true;
+    $('send').disabled = true;
+  } catch (e) {
+    log('Disconnect error: ' + e.message, 'err');
+  }
+}
+
+async function send() {
+  const text = $('cmd').value;
+  if (!text || !writer) return;
+  try {
+    await writer.write(new TextEncoder().encode(text));
+    log('TX: ' + text);
+  } catch (e) {
+    log('Write failed: ' + e.message, 'err');
+  }
+}
+
+async function readLoop() {
+  const dec = new TextDecoder();
+  reader = port.readable.getReader();
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      if (value && value.length) log('RX: ' + dec.decode(value));
+    }
+  } catch (e) {
+    log('Read error: ' + e.message, 'err');
+  } finally {
+    if (reader) { try { reader.releaseLock(); } catch (_) {} }
+  }
+}
+
+$('connect').addEventListener('click', connect);
+$('disconnect').addEventListener('click', disconnect);
+$('send').addEventListener('click', send);
+$('cmd').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+$('clear').addEventListener('click', () => $('log').textContent = '');
+</script>
+
+</body>
+</html>
