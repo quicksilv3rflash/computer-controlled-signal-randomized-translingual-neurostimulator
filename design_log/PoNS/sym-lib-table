@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "PoNS-rescue")(type "KiCad")(uri "${KIPRJMOD}/PoNS-rescue.kicad_sym")(options "")(descr ""))
+)

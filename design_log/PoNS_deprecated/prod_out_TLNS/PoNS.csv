@@ -1,0 +1,12 @@
+Part/Designator,Manufacture Part Number/Seeed SKU,Quantity,Link
+R2,301010251,1,
+"R3,R4,R5",301010300,3,
+R1,301010311,1,
+"C3,C4",302010139,2,
+"D2,D1",304090046,2,
+D3,304090057,1,
+U3,310030099,1,
+U2,310030101,1,
+"K1,K2",311020024,2,
+USB1,320010003,1,
+U1,ATXMEGA128A1-AUR,1,https://www.mouser.com/ProductDetail/Microchip-Technology-Atmel/ATXMEGA128A1-AUR/?qs=sGAEpiMZZMteY%252BlXHTQ5JDAjeyhgM5ft

@@ -1,0 +1,20 @@
+### Module positions - created on Wed Dec 23 08:48:56 2020 ###
+### Printed by Pcbnew version kicad 5.1.8-db9833491~88~ubuntu16.04.1
+## Unit = mm, Angle = deg.
+## Side : top
+# Ref     Val                                Package                        PosX       PosY       Rot  Side
+C3        CERAMIC-1UF-25V-10%-X7R_0603_      C0603                      160.5280   -72.8980  270.0000  top
+C4        CERAMIC-1UF-25V-10%-X7R_0603_      C0603                      138.1760   -85.6488  270.0000  top
+D1        SMD-LED-CLEAR-BLUE_0805_           LED-0805                   138.3792   -72.7456  270.0000  top
+D2        SMD-LED-CLEAR-RED_0805_            LED-0805                   141.8336   -72.7456  270.0000  top
+D3        SMD-LED-CLEAR-GREEN_0805_          LED-0805                   145.2880   -72.7456  270.0000  top
+R1        SMD-RES-1K-5%-1_8W_0805_           R0805                      145.7960   -76.3016  180.0000  top
+R2        SMD-RES-3.3K-1%-1_10W_0603_        R0603                      145.9992   -70.2056  180.0000  top
+R3        SMD-RES-330R-1%-1_10W_0603_        R0603                      145.8976   -68.6816  180.0000  top
+R4        SMD-RES-330R-1%-1_10W_0603_        R0603                      160.9344   -79.4512   90.0000  top
+R5        SMD-RES-330R-1%-1_10W_0603_        R0603                      139.4968   -82.6008   90.0000  top
+U1        ATxmega128A1-AU                    TQFP-100_14x14mm_P0.5mm    148.9329   -87.6808    0.0000  top
+U2        PMIC-CN3065_DFN8_                  DFN8G-0.5-3X3MM            151.1808   -72.5424  180.0000  top
+U3        PMIC-LDO-XC6206P332MR-G_SOT23_     SOT-23                     156.8704   -72.5424   90.0000  top
+USB1      MICRO-USB-SMD-B-_10118193-0001LF_  MICRO-USB5+6P-SMD-0.65-B   141.6939   -62.1665  180.0000  top
+## End
